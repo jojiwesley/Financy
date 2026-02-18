@@ -54,7 +54,7 @@ export async function updateTransaction(id: string, formData: FormData) {
 
   revalidatePath('/transactions');
   revalidatePath(`/transactions/${id}`);
-  redirect(`/transactions/${id}`);
+  // Navigation handled by the client component
 }
 
 export async function deleteTransaction(id: string) {
