@@ -44,21 +44,27 @@ export default async function DashboardPage() {
     { data: billRowsRaw },
     { data: allTxRaw },
   ] = await Promise.all([
+    // Transações do mês atual: usa reference_date quando preenchida, caso contrário date
     supabase
       .from('transactions')
-      .select('type, amount, description, date, status, categories(name, color)')
+      .select('type, amount, description, date, reference_date, status, categories(name, color)')
       .eq('user_id', user!.id)
       .eq('status', 'confirmed')
-      .gte('date', firstDay)
-      .lte('date', lastDay)
+      .or(
+        `and(reference_date.gte.${firstDay},reference_date.lte.${lastDay}),` +
+        `and(reference_date.is.null,date.gte.${firstDay},date.lte.${lastDay})`
+      )
       .order('date', { ascending: false }),
+    // Mês anterior
     supabase
       .from('transactions')
       .select('type, amount')
       .eq('user_id', user!.id)
       .eq('status', 'confirmed')
-      .gte('date', prevFirstDay)
-      .lte('date', prevLastDay),
+      .or(
+        `and(reference_date.gte.${prevFirstDay},reference_date.lte.${prevLastDay}),` +
+        `and(reference_date.is.null,date.gte.${prevFirstDay},date.lte.${prevLastDay})`
+      ),
     supabase
       .from('accounts')
       .select('name, balance, color')
@@ -70,20 +76,23 @@ export default async function DashboardPage() {
       .in('status', ['pending', 'overdue'])
       .order('due_date', { ascending: true })
       .limit(5),
+    // Últimos 6 meses para o gráfico — busca por competência
     supabase
       .from('transactions')
-      .select('type, amount, date')
+      .select('type, amount, date, reference_date')
       .eq('user_id', user!.id)
       .eq('status', 'confirmed')
-      .gte('date', sixMonthsAgoStr)
-      .lte('date', lastDay),
+      .or(
+        `and(reference_date.gte.${sixMonthsAgoStr},reference_date.lte.${lastDay}),` +
+        `and(reference_date.is.null,date.gte.${sixMonthsAgoStr},date.lte.${lastDay})`
+      ),
   ]);
 
-  type TxDash = Pick<Tables<'transactions'>, 'type' | 'amount' | 'description' | 'date' | 'status'> & {
+  type TxDash = Pick<Tables<'transactions'>, 'type' | 'amount' | 'description' | 'date' | 'reference_date' | 'status'> & {
     categories: { name: string; color: string } | null;
   };
   type TxSimple = Pick<Tables<'transactions'>, 'type' | 'amount'>;
-  type TxChart = Pick<Tables<'transactions'>, 'type' | 'amount' | 'date'>;
+  type TxChart = Pick<Tables<'transactions'>, 'type' | 'amount' | 'date' | 'reference_date'>;
   type BillDash = Pick<Tables<'bills'>, 'amount' | 'description' | 'due_date' | 'status'>;
   type AccountDash = Pick<Tables<'accounts'>, 'name' | 'balance' | 'color'>;
 
@@ -115,14 +124,18 @@ export default async function DashboardPage() {
   const incomeDelta = prevIncome > 0 ? ((income - prevIncome) / prevIncome) * 100 : null;
   const expensesDelta = prevExpenses > 0 ? ((expenses - prevExpenses) / prevExpenses) * 100 : null;
 
-  // Build 6-month chart data
+  // Build 6-month chart data — usa reference_date quando preenchida, senão date
   const monthlyChart = Array.from({ length: 6 }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
     const y = d.getFullYear();
     const m = d.getMonth() + 1;
     const monthStr = `${y}-${String(m).padStart(2, '0')}`;
     const monthLabel = d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
-    const monthTx = allTx.filter((t) => t.date.startsWith(monthStr));
+    // Agrupa pelo mês de competência (reference_date se existir, caso contrário date)
+    const monthTx = allTx.filter((t) => {
+      const ref = t.reference_date ?? t.date;
+      return ref.startsWith(monthStr);
+    });
     return {
       month: monthLabel,
       receitas: monthTx.filter((t) => t.type === 'income').reduce((s, t) => s + (t.amount ?? 0), 0),

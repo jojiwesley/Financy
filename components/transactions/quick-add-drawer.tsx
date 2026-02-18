@@ -46,8 +46,13 @@ export function QuickAddDrawer({ open, onClose }: QuickAddDrawerProps) {
   const [amountRaw, setAmountRaw] = useState('');
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
-  const [accountId, setAccountId] = useState('');
+  const [accountId, setAccountId] = useState('');  
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  // Competência: mês a que a transação pertence (pode diferir do mês de lançamento)
+  const [referenceMonth, setReferenceMonth] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  });
   const [status, setStatus] = useState<'confirmed' | 'pending'>('confirmed');
   const [installments, setInstallments] = useState(1);
   const [showInstallments, setShowInstallments] = useState(false);
@@ -133,6 +138,8 @@ export function QuickAddDrawer({ open, onClose }: QuickAddDrawerProps) {
     setDescription('');
     setCategoryId('');
     setDate(new Date().toISOString().split('T')[0]);
+    const d = new Date();
+    setReferenceMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
     setStatus('confirmed');
     setInstallments(1);
     setShowInstallments(false);
@@ -152,17 +159,22 @@ export function QuickAddDrawer({ open, onClose }: QuickAddDrawerProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Não autenticado');
 
+      // reference_date = primeiro dia do mês de competência selecionado
+      const refDate = `${referenceMonth}-01`;
+
       if (installments > 1 && type === 'expense') {
-        // Create one transaction per installment
         const rows = Array.from({ length: installments }, (_, i) => {
           const d = new Date(date);
           d.setMonth(d.getMonth() + i);
+          const ref = new Date(refDate);
+          ref.setMonth(ref.getMonth() + i);
           return {
             user_id: user.id,
             type,
             description: `${description} (${i + 1}/${installments})`,
             amount: parseFloat((amount / installments).toFixed(2)),
             date: d.toISOString().split('T')[0],
+            reference_date: ref.toISOString().split('T')[0],
             category_id: categoryId || null,
             account_id: accountId || null,
             status,
@@ -177,6 +189,7 @@ export function QuickAddDrawer({ open, onClose }: QuickAddDrawerProps) {
           description: description.trim(),
           amount,
           date,
+          reference_date: refDate,
           category_id: categoryId || null,
           account_id: accountId || null,
           status,
@@ -411,11 +424,32 @@ export function QuickAddDrawer({ open, onClose }: QuickAddDrawerProps) {
             </div>
           )}
 
+          {/* Competência */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Competência
+              </label>
+              <span className="text-xs text-muted-foreground">Mês a que pertence</span>
+            </div>
+            <input
+              type="month"
+              value={referenceMonth}
+              onChange={(e) => setReferenceMonth(e.target.value)}
+              className="h-10 w-full rounded-xl border-2 border-input bg-background px-3 text-sm focus:border-primary focus:outline-none transition-colors"
+            />
+            {referenceMonth !== `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}` && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                Essa transação será contabilizada em {new Date(`${referenceMonth}-01`).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+              </p>
+            )}
+          </div>
+
           {/* Date + Status row */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Data
+                Data do lançamento
               </label>
               <input
                 type="date"

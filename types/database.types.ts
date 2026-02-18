@@ -215,6 +215,7 @@ export type Database = {
           description: string | null;
           id: string;
           notes: string | null;
+          reference_date: string | null;
           status: string | null;
           type: string;
           user_id: string;
@@ -229,6 +230,7 @@ export type Database = {
           description?: string | null;
           id?: string;
           notes?: string | null;
+          reference_date?: string | null;
           status?: string | null;
           type: string;
           user_id: string;
@@ -243,6 +245,7 @@ export type Database = {
           description?: string | null;
           id?: string;
           notes?: string | null;
+          reference_date?: string | null;
           status?: string | null;
           type?: string;
           user_id?: string;

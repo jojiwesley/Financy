@@ -41,6 +41,11 @@ export default function NewTransactionPage() {
   const [categoryId, setCategoryId] = useState('');
   const [accountId, setAccountId] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  // Competência: mês ao qual a transação pertence (pode diferir do mês de lançamento)
+  const [referenceMonth, setReferenceMonth] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  });
   const [status, setStatus] = useState<'confirmed' | 'pending'>('confirmed');
   const [notes, setNotes] = useState('');
   const [installments, setInstallments] = useState(1);
@@ -98,6 +103,8 @@ export default function NewTransactionPage() {
     setDescription('');
     setCategoryId('');
     setDate(new Date().toISOString().split('T')[0]);
+    const d = new Date();
+    setReferenceMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
     setStatus('confirmed');
     setNotes('');
     setInstallments(1);
@@ -120,16 +127,21 @@ export default function NewTransactionPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Não autenticado');
 
+      const refDate = `${referenceMonth}-01`;
+
       if (installments > 1 && type === 'expense') {
         const rows = Array.from({ length: installments }, (_, i) => {
           const d = new Date(date);
           d.setMonth(d.getMonth() + i);
+          const ref = new Date(refDate);
+          ref.setMonth(ref.getMonth() + i);
           return {
             user_id: user.id,
             type,
             description: `${description.trim()} (${i + 1}/${installments})`,
             amount: parseFloat((amount / installments).toFixed(2)),
             date: d.toISOString().split('T')[0],
+            reference_date: ref.toISOString().split('T')[0],
             category_id: categoryId || null,
             account_id: accountId || null,
             notes: notes || null,
@@ -145,6 +157,7 @@ export default function NewTransactionPage() {
           description: description.trim(),
           amount,
           date,
+          reference_date: refDate,
           category_id: categoryId || null,
           account_id: accountId || null,
           notes: notes || null,
@@ -346,13 +359,37 @@ export default function NewTransactionPage() {
             </CardContent>
           </Card>
 
-          {/* Date, Status */}
+          {/* Date, Status, Competência */}
           <Card>
-            <CardContent className="p-5">
+            <CardContent className="p-5 space-y-4">
+              {/* Competência (full width, highlighted) */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Competência
+                  </label>
+                  <span className="text-xs text-muted-foreground">Mês a que pertence esta transação</span>
+                </div>
+                <input
+                  type="month"
+                  value={referenceMonth}
+                  onChange={(e) => setReferenceMonth(e.target.value)}
+                  className="h-11 w-full rounded-xl border-2 border-primary/30 bg-background px-3 text-sm font-medium focus:border-primary focus:outline-none transition-colors"
+                />
+                {referenceMonth !== `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}` && (
+                  <p className="flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">
+                    <span>⚠</span>
+                    Contabilizando em{' '}
+                    <strong>{new Date(`${referenceMonth}-01`).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</strong>
+                    , não no mês atual.
+                  </p>
+                )}
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Data
+                    Data do lançamento
                   </label>
                   <input
                     type="date"
