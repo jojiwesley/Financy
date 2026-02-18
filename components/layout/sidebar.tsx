@@ -8,6 +8,7 @@ import {
   Layers,
   LayoutGrid,
   LogOut,
+  Plus,
   Receipt,
   Tag,
   User,
@@ -16,6 +17,7 @@ import {
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useQuickAdd } from '@/components/transactions/quick-add-provider';
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: Home },
@@ -30,6 +32,7 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { openDrawer } = useQuickAdd();
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -45,6 +48,17 @@ export function Sidebar() {
           F
         </div>
         <span className="font-bold text-lg">Financy</span>
+      </div>
+
+      {/* Quick add button */}
+      <div className="px-3 pt-4">
+        <button
+          onClick={openDrawer}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 active:scale-[0.98] transition-all"
+        >
+          <Plus className="h-4 w-4" />
+          Nova Transação
+        </button>
       </div>
 
       {/* Navigation */}
