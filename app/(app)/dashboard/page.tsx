@@ -44,27 +44,23 @@ export default async function DashboardPage() {
     { data: billRowsRaw },
     { data: allTxRaw },
   ] = await Promise.all([
-    // Transações do mês atual: usa reference_date quando preenchida, caso contrário date
+    // Transações do mês atual: usa apenas a data real da transação para os KPIs
     supabase
       .from('transactions')
       .select('type, amount, description, date, reference_date, status, categories(name, color)')
       .eq('user_id', user!.id)
       .eq('status', 'confirmed')
-      .or(
-        `and(reference_date.gte.${firstDay},reference_date.lte.${lastDay}),` +
-        `and(reference_date.is.null,date.gte.${firstDay},date.lte.${lastDay})`
-      )
+      .gte('date', firstDay)
+      .lte('date', lastDay)
       .order('date', { ascending: false }),
-    // Mês anterior
+    // Mês anterior: também usa apenas date
     supabase
       .from('transactions')
       .select('type, amount')
       .eq('user_id', user!.id)
       .eq('status', 'confirmed')
-      .or(
-        `and(reference_date.gte.${prevFirstDay},reference_date.lte.${prevLastDay}),` +
-        `and(reference_date.is.null,date.gte.${prevFirstDay},date.lte.${prevLastDay})`
-      ),
+      .gte('date', prevFirstDay)
+      .lte('date', prevLastDay),
     supabase
       .from('accounts')
       .select('name, balance, color')
