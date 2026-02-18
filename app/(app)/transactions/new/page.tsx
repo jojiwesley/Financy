@@ -23,7 +23,7 @@ function formatCurrency(raw: string): string {
   const digits = raw.replace(/\D/g, '');
   if (!digits) return '';
   const n = parseInt(digits, 10);
-  return (n / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (n / 100).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
 function parseCurrency(formatted: string): number {
@@ -380,7 +380,7 @@ export default function NewTransactionPage() {
                   <p className="flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">
                     <span>⚠</span>
                     Contabilizando em{' '}
-                    <strong>{new Date(`${referenceMonth}-01`).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</strong>
+                    <strong>{(() => { const [y, m] = referenceMonth.split('-'); const MONTHS = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']; return `${MONTHS[parseInt(m,10)-1]} de ${y}`; })()}</strong>
                     , não no mês atual.
                   </p>
                 )}

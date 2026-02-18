@@ -20,18 +20,22 @@ const statusBadge: Record<string, string> = {
   cancelled: 'bg-slate-100 text-slate-500',
 };
 
+const SHORT_MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+
 function fmt(v: number) {
-  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return 'R$\u00a0' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+  // dateStr is YYYY-MM-DD — parse as local date without timezone shift
+  const [, m, d] = dateStr.split('-');
+  return `${d} ${SHORT_MONTHS[parseInt(m, 10) - 1]}`;
 }
 
 function formatMonth(dateStr: string) {
   // dateStr is YYYY-MM
-  const d = new Date(dateStr + '-01');
-  return d.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+  const [y, m] = dateStr.split('-');
+  return `${SHORT_MONTHS[parseInt(m, 10) - 1]} ${y}`;
 }
 
 export function TransactionListView({ transactions }: { transactions: TxRow[] }) {

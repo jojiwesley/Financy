@@ -10,7 +10,12 @@ import {
 } from 'recharts';
 
 const fmt = (v: number) =>
-  v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  'R$\u00a0' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+const SHORT_MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+function monthKey(d: Date) {
+  return `${SHORT_MONTHS[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`;
+}
 
 const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#ef4444', '#f97316', '#22c55e', '#14b8a6', '#3b82f6'];
 
@@ -50,13 +55,13 @@ export default function ReportsPage() {
       for (let i = 5; i >= 0; i--) {
         const d = new Date();
         d.setMonth(d.getMonth() - i);
-        const key = d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+        const key = monthKey(d);
         monthMap.set(key, { receitas: 0, despesas: 0 });
       }
 
       for (const tx of txs) {
-        const d = new Date(tx.date);
-        const key = d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+        const d = new Date(tx.date + 'T00:00:00');
+        const key = monthKey(d);
         const entry = monthMap.get(key);
         if (entry) {
           if (tx.type === 'income') entry.receitas += tx.amount ?? 0;
