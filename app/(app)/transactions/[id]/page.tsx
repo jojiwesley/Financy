@@ -2,10 +2,11 @@ import { createClient } from '@/lib/supabase/server';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardContent } from '@/components/ui/card';
 import { deleteTransaction } from '../actions';
-import { ArrowDownLeft, ArrowUpRight, Trash2 } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Tables } from '@/types/database.types';
+import { DeleteButton } from './delete-button';
 
 export default async function TransactionDetailPage({
   params,
@@ -58,16 +59,7 @@ export default async function TransactionDetailPage({
         >
           Voltar
         </Link>
-        <form action={deleteAction}>
-          <button
-            type="submit"
-            onClick={(e) => { if (!confirm('Excluir esta transação?')) e.preventDefault(); }}
-            className="inline-flex h-9 items-center gap-2 rounded-md bg-red-600 px-4 text-sm font-medium text-white hover:bg-red-700 transition-colors"
-          >
-            <Trash2 className="h-4 w-4" />
-            Excluir
-          </button>
-        </form>
+        <DeleteButton action={deleteAction} />
       </PageHeader>
 
       <Card className="max-w-lg">
