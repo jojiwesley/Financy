@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const transactions = [
   {
@@ -51,7 +52,7 @@ const transactions = [
 
 export function RecentTransactions() {
   return (
-    <Card className="col-span-1 lg:col-span-3">
+    <Card className="col-span-1 lg:col-span-3 h-full">
       <CardHeader>
         <CardTitle>Últimas Transações</CardTitle>
         <CardDescription>
@@ -63,22 +64,30 @@ export function RecentTransactions() {
           {transactions.map((transaction) => (
             <div
               key={transaction.id}
-              className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
+              className="group flex items-center justify-between rounded-xl border border-transparent p-3 transition-all hover:bg-muted/30 hover:border-border/50"
             >
               <div className="flex items-center gap-4">
-                <div className={`p-2 rounded-full ${transaction.type === 'income' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                    {transaction.type === 'income' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownLeft className="h-4 w-4" />}
+                <div className={cn(
+                  "flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors",
+                  transaction.type === 'income' 
+                    ? 'bg-emerald-500/10 text-emerald-600 border-emerald-200/20 group-hover:bg-emerald-500/20' 
+                    : 'bg-rose-500/10 text-rose-600 border-rose-200/20 group-hover:bg-rose-500/20'
+                )}>
+                    {transaction.type === 'income' ? <ArrowUpRight className="h-5 w-5" /> : <ArrowDownLeft className="h-5 w-5" />}
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-medium leading-none">
+                  <p className="text-sm font-semibold leading-none text-foreground/90">
                     {transaction.description}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground font-medium">
                     {transaction.category} • {transaction.date}
                   </p>
                 </div>
               </div>
-              <div className={`font-medium ${transaction.type === 'income' ? 'text-green-600' : 'text-slate-900'}`}>
+              <div className={cn(
+                "font-semibold text-sm",
+                transaction.type === 'income' ? 'text-emerald-600' : 'text-foreground'
+              )}>
                 {transaction.type === 'income' ? '+' : ''} R$ {Math.abs(transaction.amount).toFixed(2).replace('.', ',')}
               </div>
             </div>

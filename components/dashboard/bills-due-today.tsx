@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle2, AlertTriangle } from "lucide-react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const bills = [
@@ -20,24 +20,26 @@ const bills = [
 
 export function BillsDueToday() {
   return (
-    <Card className="col-span-1 lg:col-span-2">
+    <Card className="col-span-1 lg:col-span-2 h-full">
       <CardHeader>
         <CardTitle>Contas a Pagar Hoje</CardTitle>
         <CardDescription>Não atrase seus pagamentos</CardDescription>
       </CardHeader>
       <CardContent>
         {bills.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {bills.map((bill) => (
-              <div key={bill.id} className="flex items-center justify-between p-3 border rounded-lg bg-orange-50/50 border-orange-100">
+              <div key={bill.id} className="group flex items-center justify-between p-3 border rounded-xl bg-amber-500/5 border-amber-200/20 hover:bg-amber-500/10 transition-colors">
                 <div className="flex items-center gap-3">
-                  <AlertCircle className="h-5 w-5 text-orange-600" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 group-hover:bg-amber-500/20 transition-colors">
+                    <AlertCircle className="h-5 w-5" />
+                  </div>
                   <div>
-                    <p className="font-medium text-sm">{bill.title}</p>
-                    <p className="text-xs text-orange-600">Vence hoje</p>
+                    <p className="font-semibold text-sm text-foreground/90">{bill.title}</p>
+                    <p className="text-xs text-amber-600 font-medium">Vence hoje</p>
                   </div>
                 </div>
-                <div className="font-semibold text-sm">
+                <div className="font-bold text-sm">
                   R$ {bill.amount.toFixed(2).replace('.',',')}
                 </div>
               </div>
@@ -45,8 +47,8 @@ export function BillsDueToday() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
-            <CheckCircle2 className="h-8 w-8 text-green-500 mb-2" />
-            <p className="text-sm">Tudo pago por hoje!</p>
+            <CheckCircle2 className="h-10 w-10 text-emerald-500 mb-2" />
+            <p className="text-sm font-medium">Tudo pago por hoje!</p>
           </div>
         )}
       </CardContent>

@@ -204,6 +204,75 @@ export type Database = {
         };
         Relationships: [];
       };
+      time_entries: {
+        Row: {
+          id: string;
+          user_id: string;
+          date: string;
+          clock_in: string | null;
+          lunch_start: string | null;
+          lunch_end: string | null;
+          clock_out: string | null;
+          expected_hours: number | null;
+          notes: string | null;
+          created_at: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          date: string;
+          clock_in?: string | null;
+          lunch_start?: string | null;
+          lunch_end?: string | null;
+          clock_out?: string | null;
+          expected_hours?: number | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          date?: string;
+          clock_in?: string | null;
+          lunch_start?: string | null;
+          lunch_end?: string | null;
+          clock_out?: string | null;
+          expected_hours?: number | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
+      time_work_schedules: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          daily_hours: number;
+          work_days: number[];
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          daily_hours: number;
+          work_days: number[];
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          daily_hours?: number;
+          work_days?: number[];
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       transactions: {
         Row: {
           account_id: string | null;

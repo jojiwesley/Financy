@@ -28,13 +28,14 @@ interface Props {
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl border border-slate-100 bg-white p-3 shadow-lg text-sm">
-      <p className="font-semibold text-slate-700 mb-2">{label}</p>
-      {payload.map((p: { name: string; value: number; color: string }) => (
-        <div key={p.name} className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: p.color }} />
-          <span className="text-slate-500">{p.name === 'receitas' ? 'Receitas' : 'Despesas'}:</span>
-          <span className="font-semibold text-slate-800">{fmt(p.value)}</span>
+    <div className="rounded-xl border border-border/50 bg-background/80 backdrop-blur-xl p-3 shadow-xl text-sm ring-1 ring-black/5">
+      <p className="font-semibold text-foreground mb-2">{label}</p>
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+      {payload.map((p: any) => (
+        <div key={p.name} className="flex items-center gap-2 py-0.5">
+          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: p.fill }} />
+          <span className="text-muted-foreground capitalize">{p.name === 'receitas' ? 'Receitas' : 'Despesas'}:</span>
+          <span className="font-semibold text-foreground tabular-nums">{fmt(p.value)}</span>
         </div>
       ))}
     </div>
@@ -47,20 +48,21 @@ export function DashboardCharts({ monthlyData }: Props) {
   );
 
   return (
-    <div className="px-2 pb-4 pt-2">
-      <ResponsiveContainer width="100%" height={260}>
+    <div className="px-2 pb-4 pt-2 h-[260px] w-full">
+      <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={monthlyData}
           margin={{ top: 8, right: 12, left: 0, bottom: 0 }}
           barCategoryGap="28%"
           barGap={4}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="hsla(var(--border))" opacity={0.4} vertical={false} />
           <XAxis
             dataKey="month"
-            tick={{ fontSize: 11, fill: '#94a3b8' }}
+            tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
             axisLine={false}
             tickLine={false}
+            dy={8}
           />
           <YAxis
             tickFormatter={(v) =>
@@ -68,18 +70,24 @@ export function DashboardCharts({ monthlyData }: Props) {
                 ? `R$${(v / 1000).toFixed(0)}k`
                 : `R$${v}`
             }
-            tick={{ fontSize: 10, fill: '#94a3b8' }}
+            tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
             axisLine={false}
             tickLine={false}
             width={50}
             domain={[0, maxVal * 1.15 || 100]}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc', radius: 6 }} />
+          <Tooltip 
+            content={<CustomTooltip />} 
+            cursor={{ fill: 'hsl(var(--muted)/0.3)', radius: 6 }} 
+          />
           <Legend
+            verticalAlign="top"
+            align="right" 
+            height={36}
             iconType="circle"
             iconSize={8}
             formatter={(value) => (
-              <span style={{ color: '#64748b', fontSize: 12 }}>
+              <span className="text-xs text-muted-foreground font-medium ml-1">
                 {value === 'receitas' ? 'Receitas' : 'Despesas'}
               </span>
             )}
@@ -87,16 +95,16 @@ export function DashboardCharts({ monthlyData }: Props) {
           <Bar
             dataKey="receitas"
             name="receitas"
-            fill="#22c55e"
-            radius={[6, 6, 0, 0]}
-            maxBarSize={32}
+            fill="rgb(16 185 129)" // emerald-500
+            radius={[4, 4, 0, 0]}
+            maxBarSize={40}
           />
           <Bar
             dataKey="despesas"
             name="despesas"
-            fill="#f87171"
-            radius={[6, 6, 0, 0]}
-            maxBarSize={32}
+            fill="rgb(244 63 94)" // rose-500
+            radius={[4, 4, 0, 0]}
+            maxBarSize={40}
           />
         </BarChart>
       </ResponsiveContainer>

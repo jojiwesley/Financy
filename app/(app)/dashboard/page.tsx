@@ -13,6 +13,7 @@ import {
 import Link from 'next/link';
 import type { Tables } from '@/types/database.types';
 import { DashboardCharts } from '@/components/dashboard/dashboard-charts';
+import { MetricCard } from '@/components/dashboard/metric-card';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -172,16 +173,21 @@ export default async function DashboardPage() {
   };
 
   return (
-    <div className="space-y-6 bg-slate-50 dark:bg-slate-950 min-h-full -m-6 p-6">
-      <PageHeader title="Dashboard" description={`Resumo de ${monthName}`} />
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+         <div className="space-y-1">
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">Dashboard</h1>
+            <p className="text-muted-foreground">Resumo financeiro de {monthName}</p>
+         </div>
+      </div>
 
       {/* Overdue alert */}
       {overdueBills.length > 0 && (
-        <div className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
+        <div className="flex items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-red-600 dark:text-red-400 backdrop-blur-sm">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           <p className="text-sm font-medium">
             Você tem {overdueBills.length} conta{overdueBills.length > 1 ? 's' : ''} vencida{overdueBills.length > 1 ? 's' : ''}.{' '}
-            <Link href="/bills" className="underline underline-offset-2 hover:no-underline">
+            <Link href="/bills" className="underline underline-offset-2 hover:no-underline font-semibold">
               Ver agora
             </Link>
           </p>
@@ -191,93 +197,50 @@ export default async function DashboardPage() {
       {/* KPI Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Saldo — gradient card */}
-        <Card className="overflow-hidden border-0 shadow-md bg-gradient-to-br from-indigo-500 to-violet-600 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-indigo-100">Saldo Total</p>
-              <div className="rounded-full bg-white/20 p-2">
-                <Wallet className="h-4 w-4 text-white" />
-              </div>
-            </div>
-            <p className="mt-3 text-3xl font-bold tracking-tight">{fmt(totalBalance)}</p>
-            <p className="mt-1 text-xs text-indigo-200">em {accounts.length} conta{accounts.length !== 1 ? 's' : ''}</p>
-          </CardContent>
-        </Card>
+        <MetricCard
+          title="Saldo Total"
+          value={fmt(totalBalance)}
+          icon={Wallet}
+          variant="primary"
+          subValue={`em ${accounts.length} conta${accounts.length !== 1 ? 's' : ''}`}
+        />
 
         {/* Receitas */}
-        <Card className="shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">Receitas do mês</p>
-              <div className="rounded-full bg-green-100 p-2 dark:bg-green-900/30">
-                <ArrowUpRight className="h-4 w-4 text-green-600" />
-              </div>
-            </div>
-            <p className="mt-3 text-2xl font-bold text-green-600">{fmt(income)}</p>
-            <div className="mt-1 flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">
-                {transactions.filter((t) => t.type === 'income').length} transações
-              </p>
-              <DeltaBadge delta={incomeDelta} />
-            </div>
-          </CardContent>
-        </Card>
+        <MetricCard
+          title="Receitas"
+          value={fmt(income)}
+          icon={TrendingUp} // Changed icon to TrendingUp for better semantic
+          variant="success"
+          trend={incomeDelta !== null ? { value: parseFloat(incomeDelta.toFixed(1)), label: 'vs mês anterior' } : undefined}
+          subValue={`${transactions.filter((t) => t.type === 'income').length} transações`}
+        />
 
         {/* Despesas */}
-        <Card className="shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">Despesas do mês</p>
-              <div className="rounded-full bg-red-100 p-2 dark:bg-red-900/30">
-                <ArrowDownLeft className="h-4 w-4 text-red-600" />
-              </div>
-            </div>
-            <p className="mt-3 text-2xl font-bold text-red-600">{fmt(expenses)}</p>
-            <div className="mt-1 flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">
-                {transactions.filter((t) => t.type === 'expense').length} transações
-              </p>
-              <DeltaBadge delta={expensesDelta} />
-            </div>
-          </CardContent>
-        </Card>
+        <MetricCard
+          title="Despesas"
+          value={fmt(expenses)}
+          icon={TrendingDown} // Changed icon to TrendingDown
+          variant="danger"
+          trend={expensesDelta !== null ? { value: parseFloat(expensesDelta.toFixed(1)), label: 'vs mês anterior' } : undefined}
+          subValue={`${transactions.filter((t) => t.type === 'expense').length} transações`}
+        />
 
-        {/* Economia + savings rate */}
-        <Card className="shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">Economia do mês</p>
-              <div className="rounded-full bg-purple-100 p-2 dark:bg-purple-900/30">
-                <TrendingUp className="h-4 w-4 text-purple-600" />
-              </div>
-            </div>
-            <p className={`mt-3 text-2xl font-bold ${savings >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {fmt(savings)}
-            </p>
-            <div className="mt-2 space-y-1">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">Taxa de poupança</p>
-                <p className={`text-xs font-semibold ${savingsRate >= 20 ? 'text-green-600' : savingsRate >= 0 ? 'text-amber-600' : 'text-red-600'}`}>
-                  {savingsRate}%
-                </p>
-              </div>
-              <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-                <div
-                  className={`h-1.5 rounded-full transition-all ${savingsRate >= 20 ? 'bg-green-500' : savingsRate >= 0 ? 'bg-amber-500' : 'bg-red-500'}`}
-                  style={{ width: `${Math.max(0, Math.min(100, savingsRate))}%` }}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Economia */}
+        <MetricCard
+          title="Economia"
+          value={fmt(savings)}
+          icon={Wallet}
+          variant="info"
+          subValue={`${savingsRate}% da renda`}
+        />
       </div>
 
       {/* Chart + Top categories */}
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2 shadow-sm">
           <CardContent className="p-0">
-            <div className="px-6 py-4 border-b">
-              <h2 className="font-semibold">Receitas vs Despesas — últimos 6 meses</h2>
+            <div className="px-6 py-4 border-b border-border/50">
+              <h2 className="font-semibold">Receitas vs Despesas</h2>
               <p className="text-xs text-muted-foreground mt-0.5">Comparativo mensal</p>
             </div>
             <div className="p-4">
@@ -288,7 +251,7 @@ export default async function DashboardPage() {
 
         <Card className="shadow-sm">
           <CardContent className="p-0">
-            <div className="px-6 py-4 border-b">
+            <div className="px-6 py-4 border-b border-border/50">
               <h2 className="font-semibold">Top Despesas</h2>
               <p className="text-xs text-muted-foreground mt-0.5">Por categoria este mês</p>
             </div>
@@ -329,7 +292,7 @@ export default async function DashboardPage() {
         {/* Recent transactions */}
         <Card className="lg:col-span-2 shadow-sm">
           <CardContent className="p-0">
-            <div className="flex items-center justify-between px-6 py-4 border-b">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
               <div>
                 <h2 className="font-semibold">Transações Recentes</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">Este mês</p>
@@ -338,7 +301,7 @@ export default async function DashboardPage() {
                 Ver todas
               </Link>
             </div>
-            <div className="divide-y">
+            <div className="divide-y divide-border/50">
               {transactions.length === 0 ? (
                 <p className="px-6 py-8 text-center text-sm text-muted-foreground">
                   Nenhuma transação neste mês.
@@ -349,7 +312,7 @@ export default async function DashboardPage() {
                   return (
                     <div
                       key={`${tx.date}-${tx.description}-${idx}`}
-                      className="flex items-center justify-between px-6 py-3"
+                      className="flex items-center justify-between px-6 py-3 hover:bg-muted/30 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <div
@@ -386,7 +349,7 @@ export default async function DashboardPage() {
           {/* Bills due */}
           <Card className="shadow-sm">
             <CardContent className="p-0">
-              <div className="flex items-center justify-between px-6 py-4 border-b">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
                 <div>
                   <h2 className="font-semibold">Contas a Pagar</h2>
                   <p className="text-xs text-muted-foreground mt-0.5">Próximos vencimentos</p>
@@ -395,7 +358,7 @@ export default async function DashboardPage() {
                   Ver todas
                 </Link>
               </div>
-              <div className="divide-y">
+              <div className="divide-y divide-border/50">
                 {bills.length === 0 ? (
                   <p className="px-6 py-8 text-center text-sm text-muted-foreground">
                     Nenhuma conta pendente.
@@ -404,7 +367,7 @@ export default async function DashboardPage() {
                   bills.map((bill, idx) => {
                     const isOverdue = bill.status === 'overdue';
                     return (
-                      <div key={`${bill.description}-${idx}`} className="flex items-center justify-between px-6 py-3">
+                      <div key={`${bill.description}-${idx}`} className="flex items-center justify-between px-6 py-3 hover:bg-muted/30 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className={`rounded-full p-2 ${isOverdue ? 'bg-red-100 dark:bg-red-900/30' : 'bg-orange-100 dark:bg-orange-900/30'}`}>
                             <CreditCard className={`h-3.5 w-3.5 ${isOverdue ? 'text-red-600' : 'text-orange-600'}`} />
@@ -431,18 +394,18 @@ export default async function DashboardPage() {
           {/* Accounts */}
           <Card className="shadow-sm">
             <CardContent className="p-0">
-              <div className="flex items-center justify-between px-6 py-4 border-b">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
                 <h2 className="font-semibold">Suas Contas</h2>
                 <Link href="/accounts" className="text-xs text-primary hover:underline">
                   Ver todas
                 </Link>
               </div>
-              <div className="divide-y">
+              <div className="divide-y divide-border/50">
                 {accounts.length === 0 ? (
                   <p className="px-6 py-8 text-center text-sm text-muted-foreground">Nenhuma conta cadastrada.</p>
                 ) : (
                   accounts.map((acc, idx) => (
-                    <div key={`${acc.name}-${idx}`} className="flex items-center justify-between px-6 py-3">
+                    <div key={`${acc.name}-${idx}`} className="flex items-center justify-between px-6 py-3 hover:bg-muted/30 transition-colors">
                       <div className="flex items-center gap-3">
                         <div
                           className="h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm"
