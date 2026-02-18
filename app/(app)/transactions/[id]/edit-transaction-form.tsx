@@ -98,6 +98,16 @@ export function EditTransactionForm({ tx, updateAction }: Props) {
       formData.set('notes', notes);
       await updateAction(formData);
     } catch (e: unknown) {
+      // redirect() in Next.js works by throwing — must not be swallowed
+      if (
+        e != null &&
+        typeof e === 'object' &&
+        'digest' in e &&
+        typeof (e as { digest: unknown }).digest === 'string' &&
+        (e as { digest: string }).digest.startsWith('NEXT_REDIRECT')
+      ) {
+        throw e;
+      }
       setError(e instanceof Error ? e.message : 'Erro ao salvar');
       setLoading(false);
     }
