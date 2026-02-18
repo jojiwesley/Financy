@@ -2,8 +2,9 @@ import { createClient } from '@/lib/supabase/server';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { deleteCategory } from './actions';
+import { DeleteCategoryButton } from './delete-category-button';
 import type { Tables } from '@/types/database.types';
 
 export default async function CategoriesPage() {
@@ -60,15 +61,7 @@ export default async function CategoriesPage() {
                       {isGlobal ? (
                         <span className="text-xs text-muted-foreground">Padrão</span>
                       ) : (
-                        <form action={deleteAction}>
-                          <button
-                            type="submit"
-                            onClick={(e) => { if (!confirm(`Excluir "${cat.name}"?`)) e.preventDefault(); }}
-                            className="inline-flex h-7 w-7 items-center justify-center rounded hover:bg-red-50 text-red-600 transition-colors"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </form>
+                        <DeleteCategoryButton action={deleteAction} name={cat.name} />
                       )}
                     </div>
                   );
