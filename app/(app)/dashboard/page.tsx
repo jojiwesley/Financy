@@ -195,7 +195,53 @@ export default async function DashboardPage() {
       )}
 
       {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Mobile Layout: Saldo topo + Carrossel */}
+      <div className="flex flex-col gap-4 md:hidden">
+        <MetricCard
+          title="Saldo Total"
+          value={fmt(totalBalance)}
+          icon={Wallet}
+          variant="primary"
+          subValue={`em ${accounts.length} conta${accounts.length !== 1 ? 's' : ''}`}
+        />
+        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
+          <div className="min-w-[85%] snap-center flex">
+            <MetricCard
+              title="Receitas"
+              value={fmt(income)}
+              icon={TrendingUp}
+              variant="success"
+              trend={incomeDelta !== null ? { value: parseFloat(incomeDelta.toFixed(1)), label: 'vs mês anterior' } : undefined}
+              subValue={`${transactions.filter((t) => t.type === 'income').length} transações`}
+              className="w-full flex flex-col justify-between"
+            />
+          </div>
+          <div className="min-w-[85%] snap-center flex">
+            <MetricCard
+              title="Despesas"
+              value={fmt(expenses)}
+              icon={TrendingDown}
+              variant="danger"
+              trend={expensesDelta !== null ? { value: parseFloat(expensesDelta.toFixed(1)), label: 'vs mês anterior' } : undefined}
+              subValue={`${transactions.filter((t) => t.type === 'expense').length} transações`}
+              className="w-full flex flex-col justify-between"
+            />
+          </div>
+          <div className="min-w-[85%] snap-center flex">
+            <MetricCard
+              title="Economia"
+              value={fmt(savings)}
+              icon={Wallet}
+              variant="info"
+              subValue={`${savingsRate}% da renda`}
+              className="w-full flex flex-col justify-between"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Layout: Grid único */}
+      <div className="hidden md:grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Saldo — gradient card */}
         <MetricCard
           title="Saldo Total"
@@ -239,11 +285,11 @@ export default async function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2 shadow-sm">
           <CardContent className="p-0">
-            <div className="px-6 py-4 border-b border-border/50">
+            <div className="px-4 sm:px-6 py-4 border-b border-border/50">
               <h2 className="font-semibold">Receitas vs Despesas</h2>
               <p className="text-xs text-muted-foreground mt-0.5">Comparativo mensal</p>
             </div>
-            <div className="p-4">
+            <div className="p-2 sm:p-4">
               <DashboardCharts monthlyData={monthlyChart} />
             </div>
           </CardContent>
@@ -251,11 +297,11 @@ export default async function DashboardPage() {
 
         <Card className="shadow-sm">
           <CardContent className="p-0">
-            <div className="px-6 py-4 border-b border-border/50">
+            <div className="px-4 sm:px-6 py-4 border-b border-border/50">
               <h2 className="font-semibold">Top Despesas</h2>
               <p className="text-xs text-muted-foreground mt-0.5">Por categoria este mês</p>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-4 sm:p-6 space-y-4">
               {topCategories.length === 0 ? (
                 <p className="text-center text-sm text-muted-foreground py-4">Nenhuma despesa.</p>
               ) : (
@@ -292,7 +338,7 @@ export default async function DashboardPage() {
         {/* Recent transactions */}
         <Card className="lg:col-span-2 shadow-sm">
           <CardContent className="p-0">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border/50">
               <div>
                 <h2 className="font-semibold">Transações Recentes</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">Este mês</p>
@@ -312,9 +358,9 @@ export default async function DashboardPage() {
                   return (
                     <div
                       key={`${tx.date}-${tx.description}-${idx}`}
-                      className="flex items-center justify-between px-6 py-3 hover:bg-muted/30 transition-colors"
+                      className="flex items-center justify-between px-4 sm:px-6 py-3 hover:bg-muted/30 transition-colors"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
                         <div
                           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
                           style={{ backgroundColor: `${cat?.color ?? '#6366f1'}22` }}
@@ -325,15 +371,15 @@ export default async function DashboardPage() {
                             <ArrowDownLeft className="h-4 w-4 text-red-600" />
                           )}
                         </div>
-                        <div>
-                          <p className="text-sm font-medium leading-tight">{tx.description ?? '—'}</p>
-                          <p className="text-xs text-muted-foreground">
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium leading-tight truncate">{tx.description ?? '—'}</p>
+                          <p className="text-xs text-muted-foreground truncate">
                             {cat?.name ?? 'Sem categoria'} •{' '}
                             {new Date(tx.date).toLocaleDateString('pt-BR')}
                           </p>
                         </div>
                       </div>
-                      <p className={`text-sm font-semibold tabular-nums ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                      <p className={`text-sm font-semibold tabular-nums shrink-0 ml-2 ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                         {tx.type === 'income' ? '+' : '−'}
                         {fmt(tx.amount ?? 0)}
                       </p>
@@ -349,7 +395,7 @@ export default async function DashboardPage() {
           {/* Bills due */}
           <Card className="shadow-sm">
             <CardContent className="p-0">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
+              <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border/50">
                 <div>
                   <h2 className="font-semibold">Contas a Pagar</h2>
                   <p className="text-xs text-muted-foreground mt-0.5">Próximos vencimentos</p>
@@ -367,20 +413,20 @@ export default async function DashboardPage() {
                   bills.map((bill, idx) => {
                     const isOverdue = bill.status === 'overdue';
                     return (
-                      <div key={`${bill.description}-${idx}`} className="flex items-center justify-between px-6 py-3 hover:bg-muted/30 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <div className={`rounded-full p-2 ${isOverdue ? 'bg-red-100 dark:bg-red-900/30' : 'bg-orange-100 dark:bg-orange-900/30'}`}>
+                      <div key={`${bill.description}-${idx}`} className="flex items-center justify-between px-4 sm:px-6 py-3 hover:bg-muted/30 transition-colors">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={`shrink-0 rounded-full p-2 ${isOverdue ? 'bg-red-100 dark:bg-red-900/30' : 'bg-orange-100 dark:bg-orange-900/30'}`}>
                             <CreditCard className={`h-3.5 w-3.5 ${isOverdue ? 'text-red-600' : 'text-orange-600'}`} />
                           </div>
-                          <div>
-                            <p className="text-sm font-medium">{bill.description}</p>
-                            <p className={`text-xs ${isOverdue ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium truncate">{bill.description}</p>
+                            <p className={`text-xs truncate ${isOverdue ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}>
                               {isOverdue ? 'Vencida — ' : 'Vence '}
                               {new Date(bill.due_date).toLocaleDateString('pt-BR')}
                             </p>
                           </div>
                         </div>
-                        <p className={`text-sm font-semibold tabular-nums ${isOverdue ? 'text-red-600' : 'text-orange-600'}`}>
+                        <p className={`text-sm font-semibold tabular-nums shrink-0 ml-2 ${isOverdue ? 'text-red-600' : 'text-orange-600'}`}>
                           {fmt(bill.amount)}
                         </p>
                       </div>
@@ -394,7 +440,7 @@ export default async function DashboardPage() {
           {/* Accounts */}
           <Card className="shadow-sm">
             <CardContent className="p-0">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
+              <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-border/50">
                 <h2 className="font-semibold">Suas Contas</h2>
                 <Link href="/accounts" className="text-xs text-primary hover:underline">
                   Ver todas
@@ -405,7 +451,7 @@ export default async function DashboardPage() {
                   <p className="px-6 py-8 text-center text-sm text-muted-foreground">Nenhuma conta cadastrada.</p>
                 ) : (
                   accounts.map((acc, idx) => (
-                    <div key={`${acc.name}-${idx}`} className="flex items-center justify-between px-6 py-3 hover:bg-muted/30 transition-colors">
+                    <div key={`${acc.name}-${idx}`} className="flex items-center justify-between px-4 sm:px-6 py-3 hover:bg-muted/30 transition-colors">
                       <div className="flex items-center gap-3">
                         <div
                           className="h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm"

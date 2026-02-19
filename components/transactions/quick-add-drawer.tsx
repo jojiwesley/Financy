@@ -221,349 +221,301 @@ export function QuickAddDrawer({ open, onClose }: QuickAddDrawerProps) {
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+        className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
       {/* Drawer */}
       <div
         className={cn(
-          'fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-background shadow-2xl',
-          'translate-x-0 transition-transform duration-300'
+          'fixed inset-x-0 bottom-0 z-[70] flex w-full flex-col bg-background shadow-2xl transition-transform duration-300 ease-out',
+          'rounded-t-[2rem] border-t',
+          'md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg md:rounded-3xl md:border',
+          'max-h-[85vh] md:max-h-[90vh]'
         )}
         role="dialog"
         aria-modal="true"
         aria-label="Adicionar transação"
       >
         {/* Header */}
-        <div className={cn(
-          'flex items-center justify-between px-5 py-4 border-b',
-          type === 'expense' ? 'bg-red-50 dark:bg-red-950/30' : 'bg-green-50 dark:bg-green-950/30'
-        )}>
+        <div className="flex items-center justify-between px-6 pt-6 pb-4">
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Adicionar transação
-            </p>
-            <h2 className={cn(
-              'text-lg font-bold',
-              type === 'expense' ? 'text-red-700 dark:text-red-400' : 'text-green-700 dark:text-green-400'
-            )}>
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground/80">
+              Nova Transação
+            </span>
+            <h2 className="text-2xl font-bold tracking-tight">
               {type === 'expense' ? 'Despesa' : 'Receita'}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="rounded-full p-1.5 hover:bg-black/10 transition-colors"
+            className="rounded-full bg-muted p-2 text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
             aria-label="Fechar"
           >
-            <X className="h-5 w-5 text-muted-foreground" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Body — scrollable */}
-        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
-
-          {/* Type toggle */}
-          <div className="grid grid-cols-2 gap-2 rounded-xl border p-1">
-            <button
-              type="button"
-              onClick={() => { setType('expense'); setCategoryId(''); }}
-              className={cn(
-                'flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all',
-                type === 'expense'
-                  ? 'bg-red-600 text-white shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted'
-              )}
-            >
-              <ArrowDownLeft className="h-4 w-4" />
-              Despesa
-            </button>
-            <button
-              type="button"
-              onClick={() => { setType('income'); setCategoryId(''); }}
-              className={cn(
-                'flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all',
-                type === 'income'
-                  ? 'bg-green-600 text-white shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted'
-              )}
-            >
-              <ArrowUpRight className="h-4 w-4" />
-              Receita
-            </button>
-          </div>
-
-          {/* Value — big numeric input */}
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Valor
-            </label>
-            <div className={cn(
-              'flex items-center gap-2 rounded-xl border-2 px-4 py-3 transition-colors',
-              'focus-within:border-primary',
-              type === 'expense' ? 'border-red-200 dark:border-red-800' : 'border-green-200 dark:border-green-800'
-            )}>
-              <span className="text-2xl font-bold text-muted-foreground">R$</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={amountRaw}
-                onChange={(e) => setAmountRaw(formatCurrency(e.target.value))}
-                placeholder="0,00"
-                className="flex-1 bg-transparent text-3xl font-bold tracking-tight outline-none placeholder:text-muted-foreground/40"
-              />
-            </div>
-          </div>
-
-          {/* Description + autocomplete */}
-          <div className="relative space-y-1">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Descrição
-            </label>
-            <input
-              ref={descRef}
-              type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Ex: Supermercado, Aluguel..."
-              className="h-11 w-full rounded-xl border-2 border-input bg-background px-4 text-sm font-medium placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition-colors"
-            />
-            {suggestions.length > 0 && (
-              <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl border bg-background shadow-lg">
-                {suggestions.map((s) => (
-                  <li key={s}>
-                    <button
-                      type="button"
-                      onClick={() => { setDescription(s); setSuggestions([]); }}
-                      className="flex w-full items-center gap-2 px-4 py-2.5 text-sm hover:bg-accent"
-                    >
-                      <span className="text-muted-foreground">↩</span>
-                      {s}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {/* Category chips */}
-          <div className="space-y-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Categoria
-            </label>
-            <div className="flex flex-wrap gap-2">
+        <div className="flex-1 overflow-y-auto px-6 py-2 pb-safe md:pb-6">
+          <div className="space-y-6">
+            
+            {/* Type Switcher */}
+            <div className="grid grid-cols-2 gap-2 rounded-2xl bg-muted p-1.5">
               <button
                 type="button"
-                onClick={() => setCategoryId('')}
+                onClick={() => { setType('expense'); setCategoryId(''); }}
                 className={cn(
-                  'rounded-full border px-3 py-1 text-xs font-medium transition-all',
-                  !categoryId
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-input text-muted-foreground hover:border-primary hover:text-primary'
+                  'flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition-all',
+                  type === 'expense'
+                    ? 'bg-background text-red-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
               >
-                Nenhuma
+                <ArrowDownLeft className="h-4 w-4" />
+                Despesa
               </button>
-              {filteredCategories.map((cat) => (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setCategoryId(cat.id)}
-                  className={cn(
-                    'flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all',
-                    categoryId === cat.id
-                      ? 'border-transparent text-white shadow-sm'
-                      : 'border-input text-muted-foreground hover:border-primary hover:text-foreground'
-                  )}
-                  style={
-                    categoryId === cat.id
-                      ? { backgroundColor: cat.color ?? '#6366f1', borderColor: cat.color ?? '#6366f1' }
-                      : {}
-                  }
-                >
-                  {categoryId === cat.id && <Check className="h-3 w-3" />}
-                  {cat.name}
-                </button>
-              ))}
+              <button
+                type="button"
+                onClick={() => { setType('income'); setCategoryId(''); }}
+                className={cn(
+                  'flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition-all',
+                  type === 'income'
+                    ? 'bg-background text-green-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <ArrowUpRight className="h-4 w-4" />
+                Receita
+              </button>
             </div>
-          </div>
 
-          {/* Account */}
-          {accounts.length > 0 && (
+            {/* Amount Input */}
             <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Conta
+              <label className="text-xs font-bold uppercase text-muted-foreground/70">
+                Valor
+              </label>
+              <div className={cn(
+                'group flex items-center gap-2 rounded-2xl border-2 px-4 py-3 transition-colors bg-card',
+                'focus-within:border-primary/50 focus-within:ring-4 focus-within:ring-primary/10',
+                type === 'expense' 
+                  ? 'border-red-100 dark:border-red-900/30 input-expense' 
+                  : 'border-green-100 dark:border-green-900/30 input-income'
+              )}>
+                <span className="text-lg font-bold text-muted-foreground">R$</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={amountRaw}
+                  onChange={(e) => setAmountRaw(formatCurrency(e.target.value))}
+                  placeholder="0,00"
+                  className="flex-1 bg-transparent text-3xl font-black tracking-tighter outline-none placeholder:text-muted-foreground/20"
+                />
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="relative space-y-2">
+              <label className="text-xs font-bold uppercase text-muted-foreground/70">
+                Descrição
+              </label>
+              <input
+                ref={descRef}
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Ex: Supermercado"
+                className="h-12 w-full rounded-2xl border bg-muted/30 px-4 font-medium transition-all focus:border-primary/50 focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/10"
+              />
+              {suggestions.length > 0 && (
+                <ul className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border bg-background shadow-xl ring-1 ring-black/5">
+                  {suggestions.map((s) => (
+                    <li key={s}>
+                      <button
+                        type="button"
+                        onClick={() => { setDescription(s); setSuggestions([]); }}
+                        className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-muted/50 transition-colors"
+                      >
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                          <Check className="h-3 w-3" />
+                        </span>
+                        {s}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Categories */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase text-muted-foreground/70">
+                Categoria
               </label>
               <div className="flex flex-wrap gap-2">
-                {accounts.map((acc) => (
+                <button
+                  type="button"
+                  onClick={() => setCategoryId('')}
+                  className={cn(
+                    'rounded-full px-4 py-1.5 text-xs font-bold transition-all',
+                    !categoryId
+                      ? 'bg-foreground text-background shadow-sm'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  )}
+                >
+                  Geral
+                </button>
+                {filteredCategories.map((cat) => (
                   <button
-                    key={acc.id}
+                    key={cat.id}
                     type="button"
-                    onClick={() => setAccountId(acc.id)}
+                    onClick={() => setCategoryId(cat.id)}
                     className={cn(
-                      'flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition-all',
-                      accountId === acc.id
-                        ? 'border-transparent text-white shadow-sm'
-                        : 'border-input text-muted-foreground hover:border-primary hover:text-foreground'
+                      'flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs font-bold transition-all',
+                      categoryId === cat.id
+                        ? 'border-transparent text-white shadow-sm scale-105'
+                        : 'border-transparent bg-muted text-muted-foreground hover:bg-muted/80'
                     )}
                     style={
-                      accountId === acc.id
-                        ? { backgroundColor: acc.color ?? '#6366f1', borderColor: acc.color ?? '#6366f1' }
+                      categoryId === cat.id
+                        ? { backgroundColor: cat.color ?? '#6366f1' }
                         : {}
                     }
                   >
-                    {accountId === acc.id && <Check className="h-3 w-3" />}
-                    <span
-                      className="inline-block h-2 w-2 rounded-full"
-                      style={{ backgroundColor: acc.color ?? '#6366f1' }}
-                    />
-                    {acc.name}
+                    {categoryId === cat.id && <Check className="h-3 w-3 text-white" />}
+                    {cat.name}
                   </button>
                 ))}
               </div>
             </div>
-          )}
 
-          {/* Competência */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Competência
-              </label>
-              <span className="text-xs text-muted-foreground">Mês a que pertence</span>
-            </div>
-            <input
-              type="month"
-              value={referenceMonth}
-              onChange={(e) => setReferenceMonth(e.target.value)}
-              className="h-10 w-full rounded-xl border-2 border-input bg-background px-3 text-sm focus:border-primary focus:outline-none transition-colors"
-            />
-            {referenceMonth !== `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}` && (
-              <p className="text-xs text-amber-600 dark:text-amber-400">
-                Essa transação será contabilizada em {new Date(`${referenceMonth}-01`).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-              </p>
-            )}
-          </div>
+            {/* Additional Fields Collapsible (could be nice, but keeping expanded for now) */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-muted-foreground/70">
+                  Data
+                </label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="h-10 w-full rounded-xl border bg-muted/30 px-3 text-sm font-medium outline-none focus:border-primary/50 focus:bg-background focus:ring-2 focus:ring-primary/10"
+                />
+              </div>
 
-          {/* Date + Status row */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Data do lançamento
-              </label>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="h-10 w-full rounded-xl border-2 border-input bg-background px-3 text-sm focus:border-primary focus:outline-none transition-colors"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Status
-              </label>
-              <div className="grid grid-cols-2 gap-1 rounded-xl border-2 border-input p-0.5">
-                <button
-                  type="button"
-                  onClick={() => setStatus('confirmed')}
-                  className={cn(
-                    'rounded-lg py-1.5 text-xs font-medium transition-all',
-                    status === 'confirmed' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground'
-                  )}
-                >
-                  Confirmado
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStatus('pending')}
-                  className={cn(
-                    'rounded-lg py-1.5 text-xs font-medium transition-all',
-                    status === 'pending' ? 'bg-amber-500 text-white shadow-sm' : 'text-muted-foreground'
-                  )}
-                >
-                  Pendente
-                </button>
+               {/* Competência or Status */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-muted-foreground/70">
+                   Status
+                </label>
+                <div className="flex rounded-xl bg-muted/50 p-1">
+                  <button
+                    type="button"
+                    onClick={() => setStatus('confirmed')}
+                    className={cn(
+                      'flex-1 rounded-lg py-1.5 text-xs font-bold transition-all',
+                      status === 'confirmed' ? 'bg-background shadow-sm text-green-600' : 'text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    Pago
+                  </button>
+                  <button
+                     type="button"
+                     onClick={() => setStatus('pending')}
+                     className={cn(
+                       'flex-1 rounded-lg py-1.5 text-xs font-bold transition-all',
+                       status === 'pending' ? 'bg-background shadow-sm text-amber-600' : 'text-muted-foreground hover:text-foreground'
+                     )}
+                   >
+                     Pendente
+                   </button>
+                </div>
               </div>
             </div>
-          </div>
-
-          {/* Installments (expense only) */}
-          {type === 'expense' && (
-            <div className="space-y-2">
-              <button
-                type="button"
-                onClick={() => setShowInstallments((v) => !v)}
-                className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
-              >
-                <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', showInstallments && 'rotate-180')} />
-                {installments > 1 ? `Parcelado em ${installments}x de R$ ${formatCurrency(String(Math.round((parseCurrency(amountRaw) / installments) * 100)))}` : 'Parcelar compra'}
-              </button>
-              {showInstallments && (
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 18, 24].map((n) => (
-                    <button
-                      key={n}
-                      type="button"
-                      onClick={() => setInstallments(n)}
-                      className={cn(
-                        'flex h-9 w-12 items-center justify-center rounded-lg border text-sm font-semibold transition-all',
-                        installments === n
-                          ? 'border-primary bg-primary text-primary-foreground shadow-sm'
-                          : 'border-input text-muted-foreground hover:border-primary hover:text-foreground'
+            
+             {/* Installments Button */}
+            {type === 'expense' && (
+                <div className="pt-2">
+                     <button
+                        type="button"
+                        onClick={() => setShowInstallments((v) => !v)}
+                        className="flex items-center gap-2 text-xs font-bold text-primary hover:text-primary/80 transition-colors"
+                      >
+                         {showInstallments ? <ChevronDown className="h-4 w-4 rotate-180 transition-transform" /> : <ChevronDown className="h-4 w-4 transition-transform" />}
+                         {installments > 1 ? `Parcelado em ${installments}x de R$ ${formatCurrency(String(Math.round((parseCurrency(amountRaw) / installments) * 100)))}` : 'Parcelar esta despesa?'}
+                      </button>
+                      
+                       {showInstallments && (
+                        <div className="mt-3 grid grid-cols-6 gap-2">
+                          {[2, 3, 4, 5, 6, 12].map((n) => (
+                            <button
+                              key={n}
+                              type="button"
+                              onClick={() => setInstallments(n)}
+                              className={cn(
+                                'flex h-8 w-auto items-center justify-center rounded-lg border text-xs font-bold transition-all',
+                                installments === n
+                                  ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                                  : 'border-border bg-background hover:bg-muted'
+                              )}
+                            >
+                              {n}x
+                            </button>
+                          ))}
+                            <input 
+                                type="number" 
+                                className="col-span-2 h-8 rounded-lg border bg-muted/30 text-center text-xs font-bold outline-none focus:border-primary/50 focus:bg-background"
+                                placeholder="Outro"
+                                value={installments > 12 || ![2,3,4,5,6,12].includes(installments) && installments !== 1 ? installments : ''}
+                                onChange={(e) => setInstallments(parseInt(e.target.value) || 1)}
+                            />
+                        </div>
                       )}
-                    >
-                      {n}x
-                    </button>
-                  ))}
                 </div>
-              )}
-            </div>
-          )}
+            )}
+            
+            {/* Error & Success Messages */}
+            {error && (
+                <div className="rounded-2xl bg-red-50 p-4 text-sm font-medium text-red-600 dark:bg-red-900/20 dark:text-red-400">
+                  {error}
+                </div>
+            )}
+            
+            {savedOk && (
+                 <div className="rounded-2xl bg-green-50 p-4 text-sm font-medium text-green-600 dark:bg-green-900/20 dark:text-green-400 flex items-center gap-2">
+                  <Check className="h-5 w-5" />
+                  Salvo com sucesso!
+                </div>
+            )}
 
-          {error && (
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
-              {error}
-            </div>
-          )}
-
-          {savedOk && (
-            <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-800 dark:bg-green-950/30 dark:text-green-400">
-              <Check className="h-4 w-4" />
-              Transação salva!
-            </div>
-          )}
+          </div>
         </div>
 
-        {/* Footer actions */}
-        <div className="border-t bg-background px-5 py-4 space-y-2">
-          <button
-            type="button"
-            onClick={() => handleSave(false)}
-            disabled={loading}
-            className={cn(
-              'flex h-12 w-full items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-50',
-              type === 'expense'
-                ? 'bg-red-600 hover:bg-red-700 active:scale-[0.98]'
-                : 'bg-green-600 hover:bg-green-700 active:scale-[0.98]'
-            )}
-          >
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : savedOk ? (
-              <><Check className="h-4 w-4" /> Salvo!</>
-            ) : (
-              <>Salvar {type === 'expense' ? 'Despesa' : 'Receita'}</>
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSave(true)}
-            disabled={loading}
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-input bg-background text-sm font-medium text-muted-foreground hover:bg-accent transition-colors disabled:opacity-50"
-          >
-            <Plus className="h-4 w-4" />
-            Salvar e adicionar outra
-          </button>
+        {/* Footer Actions */}
+        <div className="border-t bg-background/80 p-6 backdrop-blur-xl">
+          <div className="flex gap-3">
+             <button
+              type="button"
+              onClick={() => handleSave(true)}
+              disabled={loading}
+              className="flex h-12 flex-1 items-center justify-center rounded-xl border-2 border-muted bg-transparent text-sm font-bold text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all disabled:opacity-50"
+            >
+              + Outro
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSave(false)}
+              disabled={loading}
+              className={cn(
+                'flex h-12 flex-[2] items-center justify-center gap-2 rounded-xl text-sm font-bold text-white shadow-lg transition-all disabled:opacity-50 active:scale-[0.98]',
+                type === 'expense'
+                  ? 'bg-red-600 shadow-red-500/20 hover:bg-red-700'
+                  : 'bg-green-600 shadow-green-500/20 hover:bg-green-700'
+              )}
+            >
+              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Salvar'}
+            </button>
+          </div>
         </div>
       </div>
     </>

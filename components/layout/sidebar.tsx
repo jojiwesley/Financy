@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils';
 import { useQuickAdd } from '@/components/transactions/quick-add-provider';
 
 const navItems = [
-  { href: '/', label: 'Dashboard', icon: Home },
+  { href: '/', label: 'Geral', icon: Home },
   { href: '/transactions', label: 'Transações', icon: Receipt },
   { href: '/accounts', label: 'Contas', icon: Wallet },
   { href: '/credit-cards', label: 'Cartões', icon: CreditCard },
@@ -31,24 +31,34 @@ const navItems = [
 ];
 
 const timeTrackingItems = [
-  { href: '/time-tracking', label: 'Dashboard', icon: Home },
+  { href: '/time-tracking', label: 'Visão Geral', icon: Home },
   { href: '/time-tracking/entries', label: 'Registros', icon: Clock },
   { href: '/time-tracking/reports', label: 'Relatórios', icon: LayoutGrid },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  className?: string;
+  onClose?: () => void;
+}
+
+export function Sidebar({ className, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { openDrawer } = useQuickAdd();
+  const { openActionMenu } = useQuickAdd();
 
   async function handleSignOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push('/login');
+    onClose?.();
   }
 
+  const handleLinkClick = () => {
+    onClose?.();
+  };
+
   return (
-    <aside className="flex h-screen w-72 flex-col border-r border-border/40 bg-background/60 backdrop-blur-xl z-50">
+    <aside className={cn("flex h-screen w-72 flex-col border-r border-border/40 bg-background/60 backdrop-blur-xl z-50", className)}>
       {/* Logo */}
       <div className="flex h-20 items-center gap-3 border-b border-border/40 px-6">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-violet-600 text-primary-foreground font-bold text-lg shadow-lg shadow-primary/25">
@@ -60,13 +70,13 @@ export function Sidebar() {
       {/* Quick add button */}
       <div className="px-4 pt-6 pb-2">
         <button
-          onClick={openDrawer}
+          onClick={openActionMenu}
           className="group flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 active:scale-[0.98] transition-all duration-300"
         >
           <div className="rounded-full bg-white/20 p-1 group-hover:bg-white/30 transition-colors">
             <Plus className="h-4 w-4" />
           </div>
-          Nova Transação
+          Novo Registro
         </button>
       </div>
 
@@ -78,6 +88,7 @@ export function Sidebar() {
             <Link
               key={href}
               href={href}
+              onClick={handleLinkClick}
               className={cn(
                 'group flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200',
                 active
@@ -112,6 +123,7 @@ export function Sidebar() {
           return (
             <Link
               key={href}
+              onClick={handleLinkClick}
               href={href}
               className={cn(
                 'group flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200',
@@ -133,6 +145,7 @@ export function Sidebar() {
       {/* Bottom links */}
       <div className="border-t border-border/40 px-4 py-6 space-y-1">
         <Link
+          onClick={handleLinkClick}
           href="/profile"
           className={cn(
             'flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all',

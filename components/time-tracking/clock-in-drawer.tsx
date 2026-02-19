@@ -128,220 +128,210 @@ export function ClockInDrawer({ open, onClose }: ClockInDrawerProps) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
       {/* Drawer */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl bg-background border-t border-border/50 shadow-2xl md:left-auto md:right-6 md:bottom-6 md:rounded-2xl md:w-[440px] md:border animate-in slide-in-from-bottom duration-300">
-        {/* Handle */}
+      <div
+        className={cn(
+          'fixed inset-x-0 bottom-0 z-[70] flex w-full flex-col bg-background shadow-2xl transition-transform duration-300 ease-out',
+          'rounded-t-[2rem] border-t',
+          'md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md md:rounded-3xl md:border',
+          'max-h-[85vh]'
+        )}
+      >
+        {/* Handle for mobile feel */}
         <div className="flex justify-center pt-3 pb-1 md:hidden">
-          <div className="h-1 w-10 rounded-full bg-border" />
+          <div className="h-1.5 w-12 rounded-full bg-muted" />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border/50">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <Clock className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <h2 className="font-semibold text-sm">
-                {existing ? 'Atualizar Ponto' : 'Registrar Ponto'}
+        <div className="flex items-center justify-between px-6 py-4">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground/80">
+              Controle de Ponto
+            </span>
+            <div className="flex items-center gap-2">
+              <h2 className="text-2xl font-bold tracking-tight">
+                {existing ? 'Editar Registro' : 'Novo Registro'}
               </h2>
-              <p className="text-xs text-muted-foreground">Rápido e intuitivo</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            className="rounded-full bg-muted p-2 text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {fetching ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <div className="flex flex-1 items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="p-5 space-y-4">
-            {/* Date */}
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Data</label>
-              <input
-                type="date"
-                value={date}
-                onChange={e => setDate(e.target.value)}
-                className="w-full rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
-              />
-            </div>
-
-            {/* Clock In */}
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1.5">
-                <LogIn className="h-3.5 w-3.5 text-emerald-500" />
-                Entrada
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="time"
-                  value={clockIn}
-                  onChange={e => setClockIn(e.target.value)}
-                  className="flex-1 rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
-                />
-                <button
-                  type="button"
-                  onClick={() => fillNow(setClockIn)}
-                  className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-xs font-medium text-emerald-600 hover:bg-emerald-500/20 transition-colors whitespace-nowrap"
-                >
-                  Agora
-                </button>
+          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-2 pb-safe md:pb-6">
+            <div className="space-y-6">
+              
+              {/* Date */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-muted-foreground/70">Data</label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={e => setDate(e.target.value)}
+                    className="h-12 w-full rounded-2xl border bg-muted/30 px-4 text-sm font-medium outline-none focus:border-primary/50 focus:bg-background focus:ring-2 focus:ring-primary/10"
+                  />
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* Lunch */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1.5">
-                  <Coffee className="h-3.5 w-3.5 text-amber-500" />
-                  Início Almoço
+              {/* Clock In */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-muted-foreground/70 flex items-center gap-2">
+                   <div className="h-2 w-2 rounded-full bg-emerald-500"></div> Entrada
                 </label>
-                <div className="flex gap-1.5">
+                <div className="flex gap-2">
                   <input
                     type="time"
-                    value={lunchStart}
-                    onChange={e => setLunchStart(e.target.value)}
-                    className="flex-1 min-w-0 rounded-lg border border-border/50 bg-muted/30 px-2.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
+                    value={clockIn}
+                    onChange={e => setClockIn(e.target.value)}
+                    className="flex-1 h-12 rounded-2xl border bg-muted/30 px-4 text-lg font-bold outline-none focus:border-emerald-500/50 focus:bg-background focus:ring-2 focus:ring-emerald-500/10"
                   />
                   <button
                     type="button"
-                    onClick={() => fillNow(setLunchStart)}
-                    className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-2.5 text-xs font-medium text-amber-600 hover:bg-amber-500/20 transition-colors"
+                    onClick={() => fillNow(setClockIn)}
+                    className="h-12 px-5 rounded-2xl bg-emerald-500/10 text-emerald-600 font-bold text-xs hover:bg-emerald-500/20 transition-colors capitalize"
                   >
-                    ↑
+                    Agora
                   </button>
                 </div>
               </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1.5">
-                  <Coffee className="h-3.5 w-3.5 text-amber-500" />
-                  Fim Almoço
+
+              {/* Lunch Section */}
+              <div className="rounded-3xl bg-muted/30 p-4 space-y-4 border border-border/50">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase text-muted-foreground/70">
+                    <Coffee className="h-3.5 w-3.5" />
+                    Intervalo
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Início</label>
+                    <div className="flex flex-col gap-1">
+                      <input
+                        type="time"
+                        value={lunchStart}
+                        onChange={e => setLunchStart(e.target.value)}
+                        className="h-10 w-full rounded-xl border bg-background px-3 text-sm font-bold outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10"
+                      />
+                      <button type="button" onClick={() => fillNow(setLunchStart)} className="text-[10px] font-bold text-amber-600 self-end hover:underline">USAR AGORA</button>
+                    </div>
+                  </div>
+                   <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Fim</label>
+                    <div className="flex flex-col gap-1">
+                      <input
+                        type="time"
+                        value={lunchEnd}
+                        onChange={e => setLunchEnd(e.target.value)}
+                         className="h-10 w-full rounded-xl border bg-background px-3 text-sm font-bold outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10"
+                      />
+                       <button type="button" onClick={() => fillNow(setLunchEnd)} className="text-[10px] font-bold text-amber-600 self-end hover:underline">USAR AGORA</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Clock Out */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-muted-foreground/70 flex items-center gap-2">
+                   <div className="h-2 w-2 rounded-full bg-rose-500"></div> Saída
                 </label>
-                <div className="flex gap-1.5">
+                <div className="flex gap-2">
                   <input
                     type="time"
-                    value={lunchEnd}
-                    onChange={e => setLunchEnd(e.target.value)}
-                    className="flex-1 min-w-0 rounded-lg border border-border/50 bg-muted/30 px-2.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
+                    value={clockOut}
+                    onChange={e => setClockOut(e.target.value)}
+                    className="flex-1 h-12 rounded-2xl border bg-muted/30 px-4 text-lg font-bold outline-none focus:border-rose-500/50 focus:bg-background focus:ring-2 focus:ring-rose-500/10"
                   />
                   <button
                     type="button"
-                    onClick={() => fillNow(setLunchEnd)}
-                    className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-2.5 text-xs font-medium text-amber-600 hover:bg-amber-500/20 transition-colors"
+                    onClick={() => fillNow(setClockOut)}
+                    className="h-12 px-5 rounded-2xl bg-rose-500/10 text-rose-600 font-bold text-xs hover:bg-rose-500/20 transition-colors capitalize"
                   >
-                    ↑
+                    Agora
                   </button>
                 </div>
               </div>
-            </div>
 
-            {/* Clock Out */}
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1.5">
-                <LogOut className="h-3.5 w-3.5 text-rose-500" />
-                Saída
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="time"
-                  value={clockOut}
-                  onChange={e => setClockOut(e.target.value)}
-                  className="flex-1 rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
-                />
+              {/* Notes & Hours */}
+              <div className="space-y-3">
+                 <div className="flex items-center gap-2">
+                   <button
+                    type="button"
+                    onClick={() => setShowNotes(v => !v)}
+                    className={cn(
+                      'flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all border',
+                      showNotes
+                        ? 'bg-primary/10 border-primary/20 text-primary'
+                        : 'bg-background border-border text-muted-foreground hover:bg-muted'
+                    )}
+                   >
+                     <StickyNote className="h-3.5 w-3.5" />
+                     {showNotes ? 'Ocultar Observação' : 'Adicionar Observação'}
+                   </button>
+                 </div>
+                 
+                 {showNotes && (
+                   <textarea
+                      value={notes}
+                      onChange={e => setNotes(e.target.value)}
+                      placeholder="Alguma observação importante sobre hoje?"
+                      rows={3}
+                      className="w-full rounded-2xl border bg-muted/30 p-4 text-sm font-medium outline-none focus:border-primary/50 focus:bg-background focus:ring-2 focus:ring-primary/10 resize-none"
+                    />
+                 )}
+              </div>
+
+              {error && (
+                <div className="rounded-2xl bg-rose-50 p-4 text-sm font-bold text-rose-600 flex items-center gap-2">
+                    <X className="h-4 w-4" />
+                    {error}
+                </div>
+              )}
+
+              {/* Submit Button in flow for mobile */}
+              <div className="pt-2 pb-6">
                 <button
-                  type="button"
-                  onClick={() => fillNow(setClockOut)}
-                  className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-xs font-medium text-rose-600 hover:bg-rose-500/20 transition-colors whitespace-nowrap"
+                  type="submit"
+                  disabled={loading || savedOk}
+                  className={cn(
+                    'w-full flex h-14 items-center justify-center gap-3 rounded-2xl text-base font-bold text-white shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 disabled:scale-100',
+                    savedOk
+                      ? 'bg-emerald-500 shadow-emerald-500/25'
+                      : 'bg-primary shadow-primary/25 hover:bg-primary/90'
+                  )}
                 >
-                  Agora
+                  {loading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : savedOk ? (
+                    <>
+                      <Check className="h-5 w-5" />
+                      Registrado!
+                    </>
+                  ) : (
+                    <>
+                      {existing ? 'Atualizar' : 'Confirmar Registro'}
+                    </>
+                  )}
                 </button>
               </div>
+
             </div>
-
-            {/* Expected hours + Notes toggle */}
-            <div className="flex items-center gap-3">
-              <div className="flex-1">
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                  Horas esperadas
-                </label>
-                <input
-                  type="number"
-                  step="0.5"
-                  min="1"
-                  max="24"
-                  value={expectedHours}
-                  onChange={e => setExpectedHours(e.target.value)}
-                  className="w-full rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowNotes(v => !v)}
-                className={cn(
-                  'flex items-center gap-1.5 rounded-lg border px-3 py-2.5 text-xs font-medium transition-colors mt-4',
-                  showNotes
-                    ? 'border-primary/30 bg-primary/10 text-primary'
-                    : 'border-border/50 bg-muted/30 text-muted-foreground hover:text-foreground'
-                )}
-              >
-                <StickyNote className="h-3.5 w-3.5" />
-                Nota
-              </button>
-            </div>
-
-            {/* Notes */}
-            {showNotes && (
-              <div>
-                <textarea
-                  value={notes}
-                  onChange={e => setNotes(e.target.value)}
-                  placeholder="Observações sobre o dia..."
-                  rows={2}
-                  className="w-full rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 resize-none"
-                />
-              </div>
-            )}
-
-            {error && (
-              <p className="text-xs text-rose-500 bg-rose-500/10 rounded-lg px-3 py-2">{error}</p>
-            )}
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading || savedOk}
-              className={cn(
-                'w-full flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all duration-300',
-                savedOk
-                  ? 'bg-emerald-500 text-white'
-                  : 'bg-gradient-to-r from-primary to-violet-600 text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 active:scale-[0.98]'
-              )}
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : savedOk ? (
-                <>
-                  <Check className="h-4 w-4" />
-                  Salvo!
-                </>
-              ) : (
-                <>
-                  <Clock className="h-4 w-4" />
-                  {existing ? 'Atualizar Registro' : 'Registrar Ponto'}
-                </>
-              )}
-            </button>
           </form>
         )}
       </div>

@@ -230,8 +230,77 @@ export default async function TimeTrackingDashboardPage() {
         </CardContent>
       </Card>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* KPI Cards section */}
+      {/* Mobile Layout */}
+      <div className="flex flex-col gap-4 md:hidden">
+        {/* Main KPI: Saldo do Mês */}
+        <Card className={`bg-gradient-to-br ${balanceBg} border-none text-white shadow-lg`}>
+          <CardContent className="p-5">
+            <div className="flex items-start justify-between mb-3">
+              <div className="rounded-lg bg-white/20 p-2">
+                {totalBalance >= 0 ? (
+                  <TrendingUp className="h-4 w-4" />
+                ) : (
+                  <TrendingDown className="h-4 w-4" />
+                )}
+              </div>
+              <span className="text-xs font-medium bg-white/20 rounded-full px-2 py-0.5">
+                {new Date().toLocaleDateString('pt-BR', { month: 'short' })}
+              </span>
+            </div>
+            <p className="text-2xl font-bold">{formatBalance(totalBalance)}</p>
+            <p className="text-xs text-white/70 mt-1">Saldo do mês</p>
+          </CardContent>
+        </Card>
+
+        {/* Carousel for secondary KPIs */}
+        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
+          <div className="min-w-[85%] snap-center flex">
+            <Card className="w-full flex flex-col justify-between">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="rounded-lg bg-blue-500/10 p-2">
+                    <Clock className="h-4 w-4 text-blue-500" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold">{minutesToString(totalWorkedMin)}</p>
+                <p className="text-xs text-muted-foreground mt-1">Horas trabalhadas</p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="min-w-[85%] snap-center flex">
+            <Card className="w-full flex flex-col justify-between">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="rounded-lg bg-emerald-500/10 p-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold">{completeDays}</p>
+                <p className="text-xs text-muted-foreground mt-1">Dias completos</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="min-w-[85%] snap-center flex">
+            <Card className="w-full flex flex-col justify-between">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="rounded-lg bg-amber-500/10 p-2">
+                    <Calendar className="h-4 w-4 text-amber-500" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold">{minutesToString(weekWorked)}</p>
+                <p className="text-xs text-muted-foreground mt-1">Horas esta semana</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className={`bg-gradient-to-br ${balanceBg} border-none text-white shadow-lg`}>
           <CardContent className="p-5">
             <div className="flex items-start justify-between mb-3">

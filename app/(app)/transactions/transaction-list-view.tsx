@@ -76,7 +76,7 @@ export function TransactionListView({ transactions }: { transactions: TxRow[] })
               <Link
                 key={tx.id}
                 href={`/transactions/${tx.id}`}
-                className="grid grid-cols-[auto_1fr_auto] sm:grid-cols-[2fr_1fr_1fr_1fr_auto] items-center gap-4 px-6 py-4 hover:bg-muted/30 transition-colors"
+                className="grid grid-cols-[1fr_auto] sm:grid-cols-[2fr_1fr_1fr_1fr_auto] items-center gap-4 px-4 sm:px-6 py-4 hover:bg-muted/30 transition-colors"
               >
                 {/* Descrição */}
                 <div className="flex items-center gap-3 min-w-0">
