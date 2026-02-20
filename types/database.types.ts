@@ -1,4 +1,10 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
 
 export type Database = {
   public: {
@@ -143,6 +149,8 @@ export type Database = {
       };
       installments: {
         Row: {
+          auto_confirm: boolean;
+          confirmed_installments: number;
           created_at: string;
           credit_card_id: string | null;
           current_installment: number | null;
@@ -156,6 +164,8 @@ export type Database = {
           user_id: string;
         };
         Insert: {
+          auto_confirm?: boolean;
+          confirmed_installments?: number;
           created_at?: string;
           credit_card_id?: string | null;
           current_installment?: number | null;
@@ -169,6 +179,8 @@ export type Database = {
           user_id: string;
         };
         Update: {
+          auto_confirm?: boolean;
+          confirmed_installments?: number;
           created_at?: string;
           credit_card_id?: string | null;
           current_installment?: number | null;
@@ -277,12 +289,14 @@ export type Database = {
         Row: {
           account_id: string | null;
           amount: number | null;
+          billing_month: string | null;
           category_id: string | null;
           created_at: string;
           credit_card_id: string | null;
           date: string;
           description: string | null;
           id: string;
+          installment_id: string | null;
           notes: string | null;
           reference_date: string | null;
           status: string | null;
@@ -292,12 +306,14 @@ export type Database = {
         Insert: {
           account_id?: string | null;
           amount?: number | null;
+          billing_month?: string | null;
           category_id?: string | null;
           created_at?: string;
           credit_card_id?: string | null;
           date: string;
           description?: string | null;
           id?: string;
+          installment_id?: string | null;
           notes?: string | null;
           reference_date?: string | null;
           status?: string | null;
@@ -307,12 +323,14 @@ export type Database = {
         Update: {
           account_id?: string | null;
           amount?: number | null;
+          billing_month?: string | null;
           category_id?: string | null;
           created_at?: string;
           credit_card_id?: string | null;
           date?: string;
           description?: string | null;
           id?: string;
+          installment_id?: string | null;
           notes?: string | null;
           reference_date?: string | null;
           status?: string | null;
@@ -328,9 +346,9 @@ export type Database = {
   };
 };
 
-export type Tables<T extends keyof Database['public']['Tables']> =
-  Database['public']['Tables'][T]['Row'];
-export type TablesInsert<T extends keyof Database['public']['Tables']> =
-  Database['public']['Tables'][T]['Insert'];
-export type TablesUpdate<T extends keyof Database['public']['Tables']> =
-  Database['public']['Tables'][T]['Update'];
+export type Tables<T extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][T]["Row"];
+export type TablesInsert<T extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][T]["Insert"];
+export type TablesUpdate<T extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][T]["Update"];

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Clock,
   CreditCard,
@@ -14,26 +14,26 @@ import {
   Tag,
   User,
   Wallet,
-} from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import { useQuickAdd } from '@/components/transactions/quick-add-provider';
+} from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { useQuickAdd } from "@/components/transactions/quick-add-provider";
 
 const navItems = [
-  { href: '/', label: 'Geral', icon: Home },
-  { href: '/transactions', label: 'Transações', icon: Receipt },
-  { href: '/accounts', label: 'Contas', icon: Wallet },
-  { href: '/credit-cards', label: 'Cartões', icon: CreditCard },
-  { href: '/installments', label: 'Parcelamentos', icon: Layers },
-  { href: '/bills', label: 'Contas a Pagar', icon: LayoutGrid },
-  { href: '/categories', label: 'Categorias', icon: Tag },
+  { href: "/", label: "Geral", icon: Home },
+  { href: "/transactions", label: "Transações", icon: Receipt },
+  { href: "/accounts", label: "Contas", icon: Wallet },
+  { href: "/credit-cards", label: "Cartões", icon: CreditCard },
+  { href: "/installments", label: "Parcelamentos", icon: Layers },
+  { href: "/bills", label: "Contas a Pagar", icon: LayoutGrid },
+  { href: "/categories", label: "Categorias", icon: Tag },
 ];
 
 const timeTrackingItems = [
-  { href: '/time-tracking', label: 'Visão Geral', icon: Home },
-  { href: '/time-tracking/entries', label: 'Registros', icon: Clock },
-  { href: '/time-tracking/reports', label: 'Relatórios', icon: LayoutGrid },
+  { href: "/time-tracking", label: "Visão Geral", icon: Home },
+  { href: "/time-tracking/entries", label: "Registros", icon: Clock },
+  { href: "/time-tracking/reports", label: "Relatórios", icon: LayoutGrid },
 ];
 
 interface SidebarProps {
@@ -49,7 +49,7 @@ export function Sidebar({ className, onClose }: SidebarProps) {
   async function handleSignOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push('/login');
+    router.push("/login");
     onClose?.();
   }
 
@@ -58,13 +58,20 @@ export function Sidebar({ className, onClose }: SidebarProps) {
   };
 
   return (
-    <aside className={cn("flex h-screen w-72 flex-col border-r border-border/40 bg-background/60 backdrop-blur-xl z-50", className)}>
+    <aside
+      className={cn(
+        "flex h-screen w-72 flex-col border-r border-border/40 bg-background/60 backdrop-blur-xl z-50",
+        className,
+      )}
+    >
       {/* Logo */}
       <div className="flex h-20 items-center gap-3 border-b border-border/40 px-6">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-violet-600 text-primary-foreground font-bold text-lg shadow-lg shadow-primary/25">
           F
         </div>
-        <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Financy</span>
+        <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          Financy
+        </span>
       </div>
 
       {/* Quick add button */}
@@ -83,20 +90,28 @@ export function Sidebar({ className, onClose }: SidebarProps) {
       {/* Navigation */}
       <nav className="flex-1 space-y-1.5 overflow-y-auto px-4 py-6">
         {navItems.map(({ href, label, icon: Icon }) => {
-          const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
+          const active =
+            href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
             <Link
               key={href}
               href={href}
               onClick={handleLinkClick}
               className={cn(
-                'group flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200',
+                "group flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200",
                 active
-                  ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm"
+                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
               )}
             >
-              <Icon className={cn("h-5 w-5 shrink-0 transition-colors", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+              <Icon
+                className={cn(
+                  "h-5 w-5 shrink-0 transition-colors",
+                  active
+                    ? "text-primary"
+                    : "text-muted-foreground group-hover:text-foreground",
+                )}
+              />
               {label}
               {active && (
                 <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-sm ring-2 ring-primary/20" />
@@ -117,22 +132,30 @@ export function Sidebar({ className, onClose }: SidebarProps) {
         </div>
 
         {timeTrackingItems.map(({ href, label, icon: Icon }) => {
-          const active = href === '/time-tracking'
-            ? pathname === '/time-tracking'
-            : pathname.startsWith(href);
+          const active =
+            href === "/time-tracking"
+              ? pathname === "/time-tracking"
+              : pathname.startsWith(href);
           return (
             <Link
               key={href}
               onClick={handleLinkClick}
               href={href}
               className={cn(
-                'group flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200',
+                "group flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200",
                 active
-                  ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm"
+                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
               )}
             >
-              <Icon className={cn("h-5 w-5 shrink-0 transition-colors", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+              <Icon
+                className={cn(
+                  "h-5 w-5 shrink-0 transition-colors",
+                  active
+                    ? "text-primary"
+                    : "text-muted-foreground group-hover:text-foreground",
+                )}
+              />
               {label}
               {active && (
                 <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-sm ring-2 ring-primary/20" />
@@ -148,10 +171,10 @@ export function Sidebar({ className, onClose }: SidebarProps) {
           onClick={handleLinkClick}
           href="/profile"
           className={cn(
-            'flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all',
-            pathname === '/profile'
-              ? 'bg-primary/10 text-primary border border-border/50'
-              : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+            "flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all",
+            pathname === "/profile"
+              ? "bg-primary/10 text-primary border border-border/50"
+              : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
           )}
         >
           <User className="h-5 w-5 shrink-0" />

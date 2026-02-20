@@ -2,25 +2,43 @@ import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { createBill } from "../actions";
+import { notFound } from "next/navigation";
+import { updateBill } from "../../actions";
 
-export default async function NewBillPage() {
+export default async function EditBillPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("id, name, color, type")
-    .or(`user_id.is.null,user_id.eq.${user!.id}`)
-    .order("name");
+  const [{ data: bill }, { data: categories }] = await Promise.all([
+    supabase
+      .from("bills")
+      .select("*")
+      .eq("id", id)
+      .eq("user_id", user!.id)
+      .single(),
+    supabase
+      .from("categories")
+      .select("id, name, color, type")
+      .or(`user_id.is.null,user_id.eq.${user!.id}`)
+      .order("name"),
+  ]);
+
+  if (!bill) notFound();
+
+  const action = updateBill.bind(null, id);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Nova Conta a Pagar"
-        description="Registre um boleto ou conta"
+        title="Editar Conta a Pagar"
+        description="Atualize os dados da conta"
       >
         <Link
           href="/bills"
@@ -32,7 +50,7 @@ export default async function NewBillPage() {
 
       <Card className="max-w-lg">
         <CardContent className="p-6">
-          <form action={createBill} className="space-y-5">
+          <form action={action} className="space-y-5">
             <div className="space-y-1.5">
               <label className="text-sm font-medium" htmlFor="name">
                 Descrição <span className="text-red-500">*</span>
@@ -41,6 +59,7 @@ export default async function NewBillPage() {
                 id="name"
                 name="name"
                 required
+                defaultValue={bill.description}
                 placeholder="Ex: Aluguel, Energia, Internet..."
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
@@ -56,6 +75,7 @@ export default async function NewBillPage() {
                 type="number"
                 step="0.01"
                 required
+                defaultValue={bill.amount}
                 placeholder="0,00"
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
@@ -70,6 +90,7 @@ export default async function NewBillPage() {
                 name="due_date"
                 type="date"
                 required
+                defaultValue={bill.due_date}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
@@ -81,6 +102,7 @@ export default async function NewBillPage() {
               <select
                 id="category_id"
                 name="category_id"
+                defaultValue={bill.category_id ?? ""}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="">Sem categoria</option>
@@ -98,6 +120,7 @@ export default async function NewBillPage() {
                 name="is_recurring"
                 type="checkbox"
                 value="true"
+                defaultChecked={bill.is_recurring ?? false}
                 className="h-4 w-4 rounded border-input"
               />
               <label className="text-sm" htmlFor="is_recurring">
@@ -116,7 +139,7 @@ export default async function NewBillPage() {
                 type="submit"
                 className="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
-                Criar Conta
+                Salvar Alterações
               </button>
             </div>
           </form>
