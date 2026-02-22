@@ -199,7 +199,7 @@ export default async function TimeTrackingDashboardPage({
 
       {/* Today's Status Banner */}
       <Card
-        className={`bg-gradient-to-r ${today_entry?.clock_in ? "from-primary/10 to-violet-500/10 border-primary/20" : "from-muted/50 to-muted/30"}`}
+        className={`bg-linear-to-r ${today_entry?.clock_in ? "from-primary/10 to-violet-500/10 border-primary/20" : "from-muted/50 to-muted/30"}`}
       >
         <CardContent className="p-5">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -277,7 +277,7 @@ export default async function TimeTrackingDashboardPage({
       <div className="flex flex-col gap-4 md:hidden">
         {/* Main KPI: Saldo do Mês */}
         <Card
-          className={`bg-gradient-to-br ${balanceBg} border-none text-white shadow-lg`}
+          className={`bg-linear-to-br ${balanceBg} border-none text-white shadow-lg`}
         >
           <CardContent className="p-5">
             <div className="flex items-start justify-between mb-3">
@@ -358,7 +358,7 @@ export default async function TimeTrackingDashboardPage({
       {/* Desktop Layout */}
       <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card
-          className={`bg-gradient-to-br ${balanceBg} border-none text-white shadow-lg`}
+          className={`bg-linear-to-br ${balanceBg} border-none text-white shadow-lg`}
         >
           <CardContent className="p-5">
             <div className="flex items-start justify-between mb-3">

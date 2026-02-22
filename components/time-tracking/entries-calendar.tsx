@@ -95,7 +95,7 @@ export function EntriesCalendar({
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <span className="text-xs font-medium capitalize min-w-[100px] text-center select-none">
+            <span className="text-xs font-medium capitalize min-w-25 text-center select-none">
               {monthLabel}
             </span>
             <button

@@ -142,15 +142,15 @@ export function ClockInDrawer({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
       {/* Drawer */}
       <div
         className={cn(
-          "fixed inset-x-0 bottom-0 z-[70] flex w-full flex-col bg-background shadow-2xl transition-transform duration-300 ease-out",
-          "rounded-t-[2rem] border-t",
+          "fixed inset-x-0 bottom-0 z-70 flex w-full flex-col bg-background shadow-2xl transition-transform duration-300 ease-out",
+          "rounded-t-4xl border-t",
           "md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md md:rounded-3xl md:border",
           "max-h-[85vh]",
         )}
