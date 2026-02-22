@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Clock,
   LogIn,
@@ -11,39 +11,58 @@ import {
   X,
   Loader2,
   StickyNote,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { upsertTimeEntry } from '@/app/(app)/time-tracking/actions';
-import { getCurrentTime, getTodayDate, calcWorkedMinutes, calcBalanceMinutes, formatBalance, minutesToString } from '@/lib/time-tracking';
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { TimeInput } from "@/components/ui/time-input";
+import { upsertTimeEntry } from "@/app/(app)/time-tracking/actions";
+import {
+  getCurrentTime,
+  getTodayDate,
+  calcWorkedMinutes,
+  calcBalanceMinutes,
+  formatBalance,
+  minutesToString,
+} from "@/lib/time-tracking";
 
 export default function NewTimeEntryPage() {
   const router = useRouter();
 
   const [date, setDate] = useState(getTodayDate());
-  const [clockIn, setClockIn] = useState('');
-  const [lunchStart, setLunchStart] = useState('');
-  const [lunchEnd, setLunchEnd] = useState('');
-  const [clockOut, setClockOut] = useState('');
-  const [expectedHours, setExpectedHours] = useState('8');
-  const [notes, setNotes] = useState('');
+  const [clockIn, setClockIn] = useState("");
+  const [lunchStart, setLunchStart] = useState("");
+  const [lunchEnd, setLunchEnd] = useState("");
+  const [clockOut, setClockOut] = useState("");
+  const [expectedHours, setExpectedHours] = useState("8");
+  const [notes, setNotes] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   function fillNow(setter: (v: string) => void) {
     setter(getCurrentTime());
   }
 
   // Live calculation
-  const preview = { clock_in: clockIn, lunch_start: lunchStart, lunch_end: lunchEnd, clock_out: clockOut };
+  const preview = {
+    clock_in: clockIn,
+    lunch_start: lunchStart,
+    lunch_end: lunchEnd,
+    clock_out: clockOut,
+  };
   const workedMin = calcWorkedMinutes(preview);
-  const balanceMin = workedMin > 0 ? calcBalanceMinutes(workedMin, parseFloat(expectedHours) || 8) : null;
+  const balanceMin =
+    workedMin > 0
+      ? calcBalanceMinutes(workedMin, parseFloat(expectedHours) || 8)
+      : null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!clockIn) { setError('Horário de entrada é obrigatório'); return; }
+    if (!clockIn) {
+      setError("Horário de entrada é obrigatório");
+      return;
+    }
     setLoading(true);
-    setError('');
+    setError("");
     try {
       await upsertTimeEntry({
         date,
@@ -54,9 +73,9 @@ export default function NewTimeEntryPage() {
         expected_hours: parseFloat(expectedHours) || 8,
         notes: notes || undefined,
       });
-      router.push('/time-tracking/entries');
+      router.push("/time-tracking/entries");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao salvar');
+      setError(err instanceof Error ? err.message : "Erro ao salvar");
       setLoading(false);
     }
   }
@@ -67,7 +86,9 @@ export default function NewTimeEntryPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Novo Registro</h1>
-          <p className="text-sm text-muted-foreground mt-1">Registre manualmente suas horas trabalhadas</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Registre manualmente suas horas trabalhadas
+          </p>
         </div>
         <button
           onClick={() => router.back()}
@@ -80,18 +101,24 @@ export default function NewTimeEntryPage() {
 
       {/* Live preview */}
       {workedMin > 0 && (
-        <div className={`rounded-xl p-4 flex items-center gap-4 border ${
-          balanceMin !== null && balanceMin >= 0
-            ? 'bg-emerald-500/10 border-emerald-500/20'
-            : 'bg-rose-500/10 border-rose-500/20'
-        }`}>
-          <Clock className={`h-5 w-5 shrink-0 ${balanceMin !== null && balanceMin >= 0 ? 'text-emerald-500' : 'text-rose-500'}`} />
+        <div
+          className={`rounded-xl p-4 flex items-center gap-4 border ${
+            balanceMin !== null && balanceMin >= 0
+              ? "bg-emerald-500/10 border-emerald-500/20"
+              : "bg-rose-500/10 border-rose-500/20"
+          }`}
+        >
+          <Clock
+            className={`h-5 w-5 shrink-0 ${balanceMin !== null && balanceMin >= 0 ? "text-emerald-500" : "text-rose-500"}`}
+          />
           <div className="flex-1">
             <p className="text-sm font-semibold">
               Horas trabalhadas: {minutesToString(workedMin)}
             </p>
             {balanceMin !== null && (
-              <p className={`text-xs ${balanceMin >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+              <p
+                className={`text-xs ${balanceMin >= 0 ? "text-emerald-600" : "text-rose-600"}`}
+              >
                 Saldo: {formatBalance(balanceMin)}
               </p>
             )}
@@ -108,11 +135,13 @@ export default function NewTimeEntryPage() {
           </h3>
 
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Data</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+              Data
+            </label>
             <input
               type="date"
               value={date}
-              onChange={e => setDate(e.target.value)}
+              onChange={(e) => setDate(e.target.value)}
               required
               className="w-full rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
             />
@@ -126,10 +155,9 @@ export default function NewTimeEntryPage() {
                 Entrada *
               </label>
               <div className="flex gap-2">
-                <input
-                  type="time"
+                <TimeInput
                   value={clockIn}
-                  onChange={e => setClockIn(e.target.value)}
+                  onChange={setClockIn}
                   required
                   className="flex-1 rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
                 />
@@ -150,10 +178,9 @@ export default function NewTimeEntryPage() {
                 Saída
               </label>
               <div className="flex gap-2">
-                <input
-                  type="time"
+                <TimeInput
                   value={clockOut}
-                  onChange={e => setClockOut(e.target.value)}
+                  onChange={setClockOut}
                   className="flex-1 rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
                 />
                 <button
@@ -175,10 +202,9 @@ export default function NewTimeEntryPage() {
                 Início do Almoço
               </label>
               <div className="flex gap-2">
-                <input
-                  type="time"
+                <TimeInput
                   value={lunchStart}
-                  onChange={e => setLunchStart(e.target.value)}
+                  onChange={setLunchStart}
                   className="flex-1 rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
                 />
                 <button
@@ -196,10 +222,9 @@ export default function NewTimeEntryPage() {
                 Fim do Almoço
               </label>
               <div className="flex gap-2">
-                <input
-                  type="time"
+                <TimeInput
                   value={lunchEnd}
-                  onChange={e => setLunchEnd(e.target.value)}
+                  onChange={setLunchEnd}
                   className="flex-1 rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
                 />
                 <button
@@ -224,28 +249,30 @@ export default function NewTimeEntryPage() {
             <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
               Horas esperadas para este dia
             </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="number"
-                step="0.5"
-                min="1"
-                max="24"
-                value={expectedHours}
-                onChange={e => setExpectedHours(e.target.value)}
-                className="w-32 rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
-              />
-              <span className="text-sm text-muted-foreground">horas</span>
-              <div className="flex gap-2">
-                {[6, 7, 7.5, 8, 9].map(h => (
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  step="0.5"
+                  min="1"
+                  max="24"
+                  value={expectedHours}
+                  onChange={(e) => setExpectedHours(e.target.value)}
+                  className="w-24 rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
+                />
+                <span className="text-sm text-muted-foreground">horas</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {[6, 7, 7.5, 8, 9].map((h) => (
                   <button
                     key={h}
                     type="button"
                     onClick={() => setExpectedHours(String(h))}
                     className={cn(
-                      'rounded-lg border px-3 py-2 text-xs font-medium transition-colors',
+                      "rounded-lg border px-3 py-2 text-xs font-medium transition-colors",
                       expectedHours === String(h)
-                        ? 'border-primary/30 bg-primary/10 text-primary'
-                        : 'border-border/50 bg-muted/30 text-muted-foreground hover:text-foreground'
+                        ? "border-primary/30 bg-primary/10 text-primary"
+                        : "border-border/50 bg-muted/30 text-muted-foreground hover:text-foreground",
                     )}
                   >
                     {h}h
@@ -264,7 +291,7 @@ export default function NewTimeEntryPage() {
           </h3>
           <textarea
             value={notes}
-            onChange={e => setNotes(e.target.value)}
+            onChange={(e) => setNotes(e.target.value)}
             placeholder="Adicione observações sobre o dia (opcional)..."
             rows={3}
             className="w-full rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 resize-none"
@@ -272,7 +299,9 @@ export default function NewTimeEntryPage() {
         </div>
 
         {error && (
-          <p className="text-sm text-rose-500 bg-rose-500/10 rounded-xl px-4 py-3">{error}</p>
+          <p className="text-sm text-rose-500 bg-rose-500/10 rounded-xl px-4 py-3">
+            {error}
+          </p>
         )}
 
         <button
